@@ -24,9 +24,7 @@ public class MoveTexture : MonoBehaviour {
                 Vector2 subValue = new Vector2(0.0f, 1.0f);
                 while (true)
                 {
-                    currentOffset += Time.deltaTime * VecSpeed;
-                    if (currentOffset.y > subValue.y)
-                        currentOffset -= subValue;
+                    currentOffset = new Vector2(0f, Mathf.Repeat(Time.deltaTime * VecSpeed.y + currentOffset.y, 1));
 
                     _mat.SetTextureOffset("_MainTex", currentOffset);
                     yield return null;
