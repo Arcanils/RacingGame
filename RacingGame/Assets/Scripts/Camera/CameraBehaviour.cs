@@ -53,15 +53,18 @@ public class CameraBehaviour : MonoBehaviour {
 
 	private IEnumerator FollowPlayer()
 	{
+		while (PlayerManager.Instance == null || PlayerManager.Instance.TransPlayer == null)
+			yield return null;
+
 		while (true)
 		{
-			_trans.position = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerBehaviour.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
-			yield return null;
+			_trans.position = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerManager.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
+			yield return new WaitForEndOfFrame();
 		}
 	}
 	private IEnumerator SwitchCarCam(Transform NextCar, float TimeSwitch, System.Action FuncAtEnd)
 	{
-		Vector3 BegPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerBehaviour.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
+		Vector3 BegPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerManager.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
 		Vector3 EndPos;
 
 		Debug.LogError(TimeSwitch);

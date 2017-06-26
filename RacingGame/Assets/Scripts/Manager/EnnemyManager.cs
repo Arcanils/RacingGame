@@ -15,7 +15,6 @@ public class EnnemyManager : MonoBehaviour {
 
 	public void Awake()
 	{
-		Debug.LogError("!!");
 		Instance = this;
 	}
 
@@ -122,8 +121,9 @@ public class EnnemyManager : MonoBehaviour {
 				if (!script)
 					throw new System.Exception();
 				var type = _config.GetRandType();
-				script.Init(_config.ListEnnemyData.Find(element => element.CurrentCarType == type), 
-					new Vector3(_posSpawn[indexSpawn].x, _posSpawn[indexSpawn].y, PlayerBehaviour.Instance.TransPlayer.position.z + _config.SpawnDistanceFromPlayer));
+				script.Init(_config.ListEnnemyData.Find(element => element.CarData.CurrentCarType == type), 
+					new Vector3(_posSpawn[indexSpawn].x, _posSpawn[indexSpawn].y, PlayerManager.Instance.TransPlayer.position.z + _config.SpawnDistanceFromPlayer));
+				script.StartLogic();
 			}
 		}
 		_previousSpawn = _nextSpawn;

@@ -56,7 +56,7 @@ public class RoadManager : MonoBehaviour {
 		Vector3 LastPositionRoad = _roadAlive[_roadAlive.Count - 1].transform.position;
 		while (true)
 		{
-			while (PlayerBehaviour.Instance.TransPlayer.position.z < _roadAlive[currentFirst].position.z + _distanceFromPlayer)
+			while (PlayerManager.Instance.TransPlayer.position.z < _roadAlive[currentFirst].position.z + _distanceFromPlayer)
 				yield return null;
 			LastPositionRoad += _offsetRoad;
 			_roadAlive[currentFirst].position = LastPositionRoad;

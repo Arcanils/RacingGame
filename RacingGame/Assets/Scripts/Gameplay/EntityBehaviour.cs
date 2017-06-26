@@ -1,59 +1,61 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class EntityBehaviour<T, S> : MonoBehaviour 
-	where T : EntityConfig
+public abstract class EntityBehaviour<S> : MonoBehaviour 
 	where S : EntityData
 {
-	protected T _config;
 	protected S _data;
-	protected BaseEntity _currentBody;
+	public BaseEntity CurrentBody { get; protected set; }
 
-	public void Init(T Config, Vector3 Position)
+	public void Init(S Data, Vector3 Position)
 	{
-		InitConfig(Config);
-		InitData();
+		InitData(Data);
 		GameObject instancePool;
-		if (!PoolManager.Instance.GetObject(_config.GetIDPoolObject(), out instancePool))
+		if (!PoolManager.Instance.GetObject(Data.GetIDPoolObject(), out instancePool))
 		{
 			throw new System.Exception();
 		}
 
-		_currentBody = instancePool.GetComponent<BaseEntity>();
+		CurrentBody = instancePool.GetComponent<BaseEntity>();
 
-		if (_currentBody == null)
+		if (CurrentBody == null)
 			throw new System.Exception();
 
-		_currentBody.SetPosition(Position);
-		_currentBody.Init(transform);
-		_currentBody.EventCollision += OnCollision;
+		CurrentBody.SetPosition(Position);
+		CurrentBody.Init(transform, GetType().ToString() == "PlayerBehaviour");
+		CurrentBody.EventCollision += OnCollision;
 
-		StartCoroutine(BehaviourEnum());
 	}
-
+	/*
 
 	protected void InitConfig(T Config)
 	{
 		_config.Init(Config);
 	}
-	protected void InitData(T Config)
+	*/
+	protected void InitData(S Data)
 	{
-		_data.Init(Config);
+		_data.Init(Data);
 	}
 
+
+	public virtual void StartLogic()
+	{
+		StartCoroutine(BehaviourEnum());
+	}
 	public IEnumerator BehaviourEnum()
 	{
 		while (true)
 		{
-			_currentBody.Move(GetVecSpeed());
+			CurrentBody.Move(GetVecSpeed());
 			yield return null;
 		}
 	}
 
 	protected abstract void OnCollision(Collision collision);
 
-	protected Vector3 GetVecSpeed()
+	protected virtual Vector3 GetVecSpeed()
 	{
-		return new Vector3(0f, 0f, _config.GetSpeedZ());
+		return new Vector3(0f, 0f, _data.GetSpeedZ());
 	}
 }

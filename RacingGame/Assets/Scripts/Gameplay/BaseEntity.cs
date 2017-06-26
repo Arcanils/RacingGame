@@ -8,6 +8,7 @@ public class BaseEntity : MonoBehaviour
 	public Action<Collision> EventCollision;
 
 	public CarType Type;
+	public bool IsPlayer { get; private set; }
 
 	private Rigidbody _rigid;
 	private BoxCollider _col;
@@ -31,7 +32,8 @@ public class BaseEntity : MonoBehaviour
 	}
 
 	public void Init(Transform Parent, bool IsPlayer = false)
-	{ 
+	{
+		this.IsPlayer = IsPlayer;
 		_rigid.constraints = RigidbodyConstraints.FreezeAll;
 		_trans.parent = Parent;
 		tag = IsPlayer ? "Player" : "Ennemy";

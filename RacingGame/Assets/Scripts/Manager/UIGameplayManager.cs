@@ -22,11 +22,11 @@ public class UIGameplayManager : MonoBehaviour {
 
 	public void Init()
 	{
-		PlayerBehaviour.Instance.EventChangeHP += OnChangeHP;
-		PlayerBehaviour.Instance.EventChangePowerCharge += OnChangePowerCharge;
-		OnChangeHP(PlayerBehaviour.Instance.GetHP());
+		PlayerManager.Instance.InstanceP.EventChangeHP += OnChangeHP;
+		PlayerManager.Instance.InstanceP.EventChangePowerCharge += OnChangePowerCharge;
+		OnChangeHP(PlayerManager.Instance.InstanceP.GetHP());
 
-		PowerBut.onClick.AddListener(PlayerBehaviour.Instance.CallPowerUp);
+		PowerBut.onClick.AddListener(PlayerManager.Instance.InstanceP.CallPowerUp);
 		
 	}
 

@@ -15,14 +15,14 @@ public class GameplayManager : MonoBehaviour {
 
 	public void Init(PlayerConfig PConfig, EnnemyConfig EConfig, CameraConfig CConfig)
 	{
+		InitCam(CConfig);
 		InitPlayer(PConfig);
 		InitEnnemy(EConfig);
-		InitCam(CConfig);
 	}
 
 	public void InitPlayer(PlayerConfig PConfig)
 	{
-		PlayerBehaviour.Instance.Init(PConfig);
+		PlayerManager.Instance.Init(PConfig);
 	}
 
 	public void InitEnnemy(EnnemyConfig EConfig)
@@ -37,7 +37,7 @@ public class GameplayManager : MonoBehaviour {
 
 	public void StartLogic()
 	{
-		PlayerBehaviour.Instance.StartLogic();
+		PlayerManager.Instance.StartLogic();
 		EnnemyManager.Instance.StartLogic();
 	}
 }

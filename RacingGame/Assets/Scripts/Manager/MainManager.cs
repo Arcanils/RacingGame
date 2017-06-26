@@ -31,7 +31,7 @@ public class MainManager : MonoBehaviour {
 
 		PoolManager.Instance.Init();
 		RoadManager.Instance.Init(_config.AreaData);
-		GameplayManager.Instance.Init(_config.PlayerData, _config.EnnemyData, _config.CameraData);
+		GameplayManager.Instance.Init(_config.PlayerData.Config, _config.EnnemyData.Config, _config.CameraData);
 		UIGameplayManager.Instance.Init();
 
 		//FadeOut

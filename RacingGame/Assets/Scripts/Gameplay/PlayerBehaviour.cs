@@ -3,30 +3,12 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 
-public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
-
-	public static PlayerBehaviour Instance { get; private set; }
-	
-
-	public Transform TransPlayer
-	{
-		get
-		{
-			return _currentBody != null ? _currentBody.transform : null;
-		}
-	}
+public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 
 	public Action<float> EventChangeScore;
 	public Action<int> EventChangeHP;
 	public Action<float> EventChangePowerCharge;
 	
-
-	private CarPlayerData _data;
-
-	internal void AddBonus(BonusData data)
-	{
-		throw new NotImplementedException();
-	}
 
 	private bool _modeSwitchOn = false;
 
@@ -38,17 +20,13 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 		}
 		private set
 		{
-			_currentPowerCharge = Mathf.Clamp(value, 0, _config.PowerChargeMax);
+			_currentPowerCharge = Mathf.Clamp(value, 0, _data.PowerChargeMax);
 			if (EventChangePowerCharge != null)
 				EventChangePowerCharge(_currentPowerCharge);
 		}
 	}
 
 	private float _currentPowerCharge;
-	public void Awake()
-	{
-		Instance = this;
-	}
 	/*
 	public void Init(PlayerConfig PConfig)
 	{
@@ -71,7 +49,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 
 	private void InitPower()
 	{
-		CurrentPowerCharge = _config.BegPowerCharge * _config.PowerChargeMax;
+		CurrentPowerCharge = _data.BegPowerCharge * _data.PowerChargeMax;
 		StartCoroutine(GainPowerUpThroughTime());
 	}
 
@@ -79,23 +57,18 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 	{
 		while (true)
 		{
-			CurrentPowerCharge += Time.deltaTime * _config.PowerChargeBySec;
+			CurrentPowerCharge += Time.deltaTime * _data.PowerChargeBySec;
 			yield return null;
 		}
 	}
-
-	public void StartLogic()
-	{
-		StartCoroutine(BehaviourEnum());
-	}
 	
 #if UNITY_STANDALONE || UNITY_EDITOR
-	public new Vector3 GetVecSpeed()
+	protected override Vector3 GetVecSpeed()
 	{
-		return new Vector3(Input.GetAxis("Horizontal") * _data.SpeedSides, 0f, _data.Speed);
+		return new Vector3(Input.GetAxis("Horizontal") * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
 	}
 #else
-	public override Vector3 GetVecSpeed()
+	protected override Vector3 GetVecSpeed()
 	{
 		return new Vector3(Input.acceleration.x * _data.SpeedSides, 0f, _data.Speed);
 	}
@@ -104,12 +77,12 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 
 	public bool DamageLogic(int Damage)
 	{
-		_data.CurrentHP -= Damage;
+		_data.CarData.CurrentHP -= Damage;
 		if (EventChangeHP != null)
-			EventChangeHP.Invoke(_data.CurrentHP);
-		Debug.LogError("Damage / End :" + _data.CurrentHP);
+			EventChangeHP.Invoke(_data.CarData.CurrentHP);
+		Debug.LogError("Damage / End :" + _data.CarData.CurrentHP);
 		//TextEndurance.text = "Endurance : " + _currentHP.ToString() + "%";
-		return _data.CurrentHP > 0;
+		return _data.CarData.CurrentHP > 0;
 	}
 
 	public void HitByEnnemy(EnnemyBehaviour Ennemy)
@@ -123,14 +96,14 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 
 	public void ResetHP()
 	{
-		_data.CurrentHP = _data.HP;
+		_data.CarData.CurrentHP = _data.CarData.HP;
 		if (EventChangeHP != null)
-			EventChangeHP.Invoke(_data.CurrentHP);
+			EventChangeHP.Invoke(_data.CarData.CurrentHP);
 	}
 
 	public int GetHP()
 	{
-		return _data.CurrentHP;
+		return _data.CarData.CurrentHP;
 	}
 
 	public void CallPowerUp()
@@ -156,7 +129,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 						var script = Info.transform.GetComponent<BaseEntity>();
 						if (!script)
 							throw new Exception();
-						CameraBehaviour.Instance.SwitchTargetCam(Info.transform, 2f, () => SwitchBody(script));
+						CameraBehaviour.Instance.SwitchTargetCam(Info.transform, 2f, () => PlayerManager.Instance.SwitchBodyForPlayer(script));
 						yield break;
 					}
 				}
@@ -166,18 +139,26 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 		Time.timeScale = 1.0f;
 	}
 
-	public void SwitchBody(BaseEntity NextBody)
+	public void SwitchBody(BaseEntity NextBody, CarPlayerData Data)
 	{
-		_currentBody = NextBody;
-		this._data.Init(_config.ListPlayerData.Find(element => element.CurrentCarType == _currentBody.Type));
-		_currentBody.Init(transform, true);
+		_data.CarData = Data;
+		CurrentBody = NextBody;
+		CurrentBody.Init(transform, true);
 		_modeSwitchOn = false;
 		ResetHP();
+		CurrentPowerCharge = 0f;
 		Time.timeScale = 1.0f;
 	}
 
 	protected override void OnCollision(Collision collision)
 	{
 		Debug.LogError("Collision from Player");
+	}
+
+
+	public void AddBonus(BonusData data)
+	{
+		if (data.CurrentBonus == BonusData.TypeBonus.PowerCharge)
+			CurrentPowerCharge += data.Value;
 	}
 }
