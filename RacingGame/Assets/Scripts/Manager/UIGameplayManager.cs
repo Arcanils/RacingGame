@@ -9,7 +9,7 @@ public class UIGameplayManager : MonoBehaviour {
 	public Text Score;
 	public Text Multiplicateur;
 	public Text Life;
-	public Text PowerCharge;
+	public Image PowerCharge;
 	public Text CenterScreenTxt;
 	public Button PowerBut;
 	public Button PauseBut;
@@ -23,8 +23,11 @@ public class UIGameplayManager : MonoBehaviour {
 	public void Init()
 	{
 		PlayerBehaviour.Instance.EventChangeHP += OnChangeHP;
+		PlayerBehaviour.Instance.EventChangePowerCharge += OnChangePowerCharge;
 		OnChangeHP(PlayerBehaviour.Instance.GetHP());
+
 		PowerBut.onClick.AddListener(PlayerBehaviour.Instance.CallPowerUp);
+		
 	}
 
 
@@ -45,7 +48,11 @@ public class UIGameplayManager : MonoBehaviour {
 
 	public void OnChangePowerCharge(float NewValue)
 	{
-		PowerCharge.text = "PowerCharge : " + NewValue.ToString();
+		PowerCharge.fillAmount = Mathf.Clamp01(1 - NewValue);
+		if (PowerCharge.fillAmount <= 0f)
+		{
+			//AnimationFX;
+		}
 	}
 
 	public IEnumerator PrintTimerStart()

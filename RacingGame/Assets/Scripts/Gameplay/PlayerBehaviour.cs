@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 
-public class PlayerBehaviour : MonoBehaviour {
+public class PlayerBehaviour : EntityBehaviour<PlayerConfig>{
 
 	public static PlayerBehaviour Instance { get; private set; }
 	
@@ -18,21 +18,42 @@ public class PlayerBehaviour : MonoBehaviour {
 
 	public Action<float> EventChangeScore;
 	public Action<int> EventChangeHP;
-	public Action<int> EventChangePowerCharge;
-
-	private BaseEntity _currentBody;
+	public Action<float> EventChangePowerCharge;
+	
 
 	private CarPlayerData _data;
+
+	internal void AddBonus(BonusData data)
+	{
+		throw new NotImplementedException();
+	}
+
 	private bool _modeSwitchOn = false;
-	private PlayerConfig _config;
+
+	public float CurrentPowerCharge
+	{
+		get
+		{
+			return _currentPowerCharge;
+		}
+		private set
+		{
+			_currentPowerCharge = Mathf.Clamp(value, 0, _config.PowerChargeMax);
+			if (EventChangePowerCharge != null)
+				EventChangePowerCharge(_currentPowerCharge);
+		}
+	}
+
+	private float _currentPowerCharge;
 	public void Awake()
 	{
 		Instance = this;
 	}
-
+	/*
 	public void Init(PlayerConfig PConfig)
 	{
 		_config = PConfig;
+
 		this._data.Init(PConfig.ListPlayerData.Find(element => element.CurrentCarType == PConfig.StartPlayer));
 		GameObject instancePool;
 		if (!PoolManager.Instance.GetObject(_data.CurrentCarType.ToString() + "Part", out instancePool))
@@ -46,29 +67,35 @@ public class PlayerBehaviour : MonoBehaviour {
 			throw new System.Exception();
 
 		_currentBody.Init(transform, true);
+	}*/
+
+	private void InitPower()
+	{
+		CurrentPowerCharge = _config.BegPowerCharge * _config.PowerChargeMax;
+		StartCoroutine(GainPowerUpThroughTime());
+	}
+
+	public IEnumerator GainPowerUpThroughTime()
+	{
+		while (true)
+		{
+			CurrentPowerCharge += Time.deltaTime * _config.PowerChargeBySec;
+			yield return null;
+		}
 	}
 
 	public void StartLogic()
 	{
 		StartCoroutine(BehaviourEnum());
 	}
-
-	public IEnumerator BehaviourEnum()
-	{
-		while (true)
-		{
-			_currentBody.Move(GetVecSpeed());
-			yield return new WaitForFixedUpdate();
-		}
-	}
 	
 #if UNITY_STANDALONE || UNITY_EDITOR
-	public Vector3 GetVecSpeed()
+	public new Vector3 GetVecSpeed()
 	{
 		return new Vector3(Input.GetAxis("Horizontal") * _data.SpeedSides, 0f, _data.Speed);
 	}
 #else
-	public Vector3 GetVecSpeed()
+	public override Vector3 GetVecSpeed()
 	{
 		return new Vector3(Input.acceleration.x * _data.SpeedSides, 0f, _data.Speed);
 	}
@@ -115,7 +142,7 @@ public class PlayerBehaviour : MonoBehaviour {
 	private IEnumerator SwitchCarEnum()
 	{
 		_modeSwitchOn = true;
-		Time.timeScale = 0.1f;
+		Time.timeScale = 0.01f;
 		for (float t = 0f; t < 5f; t += Time.unscaledDeltaTime)
 		{
 			if (Input.GetMouseButton(0))
@@ -147,5 +174,10 @@ public class PlayerBehaviour : MonoBehaviour {
 		_modeSwitchOn = false;
 		ResetHP();
 		Time.timeScale = 1.0f;
+	}
+
+	protected override void OnCollision(Collision collision)
+	{
+		Debug.LogError("Collision from Player");
 	}
 }

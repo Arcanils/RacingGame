@@ -32,7 +32,7 @@ public class EnnemyBehaviour : MonoBehaviour {
 		while (true)
 		{
 			_currentBody.Move(new Vector3(0f,0f, _data.CurrentSpeedZ));
-			yield return new WaitForFixedUpdate();
+			yield return null;
 		}
 	}
 
