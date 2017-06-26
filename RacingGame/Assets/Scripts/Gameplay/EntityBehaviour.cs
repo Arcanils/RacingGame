@@ -4,8 +4,15 @@ using System.Collections;
 public abstract class EntityBehaviour<S> : MonoBehaviour 
 	where S : EntityData
 {
-	protected S _data;
 	public BaseEntity CurrentBody { get; protected set; }
+
+	protected S _data;
+	protected IEnumerator _behaviourMove;
+
+	public void Awake()
+	{
+		_behaviourMove = BehaviourMoveEnum();
+	}
 
 	public void Init(S Data, Vector3 Position)
 	{
@@ -24,7 +31,7 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 		CurrentBody.SetPosition(Position);
 		CurrentBody.Init(transform, GetType().ToString() == "PlayerBehaviour");
 		CurrentBody.EventCollision += OnCollision;
-
+		GameplayManager.Instance.AddBaseEntityInstance(ApplyBehaviour);
 	}
 	/*
 
@@ -41,9 +48,14 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 
 	public virtual void StartLogic()
 	{
-		StartCoroutine(BehaviourEnum());
+		//StartCoroutine(BehaviourEnum());
 	}
-	public IEnumerator BehaviourEnum()
+
+	public void ApplyBehaviour()
+	{
+		_behaviourMove.MoveNext();
+	}
+	public IEnumerator BehaviourMoveEnum()
 	{
 		while (true)
 		{

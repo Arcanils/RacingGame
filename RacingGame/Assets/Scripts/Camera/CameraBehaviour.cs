@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class CameraBehaviour : MonoBehaviour {
 
@@ -14,6 +15,7 @@ public class CameraBehaviour : MonoBehaviour {
 	private Camera _cam;
 	private Transform _trans;
 	private IEnumerator _fctSwitch;
+	private IEnumerator _fctBehaviour;
 	public void Awake()
 	{
 		Instance = this;
@@ -24,7 +26,7 @@ public class CameraBehaviour : MonoBehaviour {
 
 	public void Init(CameraConfig CConfig)
 	{
-		StartCoroutine(Behaviour());
+		_fctBehaviour = Behaviour();
 	}
 
 	public IEnumerator Behaviour()
@@ -62,6 +64,12 @@ public class CameraBehaviour : MonoBehaviour {
 			yield return new WaitForEndOfFrame();
 		}
 	}
+
+	public void ApplyBehaviour()
+	{
+		_fctBehaviour.MoveNext();
+	}
+
 	private IEnumerator SwitchCarCam(Transform NextCar, float TimeSwitch, System.Action FuncAtEnd)
 	{
 		Vector3 BegPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerManager.Instance.TransPlayer.position.z + OffsetFromPlayer.z);

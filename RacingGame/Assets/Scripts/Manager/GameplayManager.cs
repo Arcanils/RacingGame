@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
-public class GameplayManager : MonoBehaviour {
+public class GameplayManager : MonoBehaviour{
 
 	public static GameplayManager Instance { get; private set; }
 
+	private List<Action> _listEntityApplyBehaviour = new List<Action>();
 
 	public void Awake()
 	{
@@ -39,5 +41,25 @@ public class GameplayManager : MonoBehaviour {
 	{
 		PlayerManager.Instance.StartLogic();
 		EnnemyManager.Instance.StartLogic();
+		StartCoroutine(GameplayLogicEnum());
+	}
+
+	private IEnumerator GameplayLogicEnum()
+	{
+		while(true)
+		{
+			for (int i = 0, iLength = _listEntityApplyBehaviour.Count; i < iLength; ++i)
+			{
+				_listEntityApplyBehaviour[i].Invoke();
+			}
+
+			CameraBehaviour.Instance.ApplyBehaviour();
+			yield return null;
+		}
+	}
+
+	public void AddBaseEntityInstance(Action Behaviour)
+	{
+		_listEntityApplyBehaviour.Add(Behaviour);
 	}
 }
