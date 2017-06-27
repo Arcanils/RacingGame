@@ -11,6 +11,14 @@ public class CameraBehaviour : MonoBehaviour {
 
 	public System.Action EventEndSwitchCar;
 
+	public Vector3 PositionPowerTransition
+	{
+		get
+		{
+			return OffsetFromPlayer + _trans.position;
+		}
+	}
+
 
 	private Camera _cam;
 	private Transform _trans;
@@ -55,12 +63,15 @@ public class CameraBehaviour : MonoBehaviour {
 
 	private IEnumerator FollowPlayer()
 	{
-		while (PlayerManager.Instance == null || PlayerManager.Instance.TransPlayer == null)
+		while (PlayerManager.Instance == null)
 			yield return null;
 
 		while (true)
 		{
-			_trans.position = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerManager.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
+			_trans.position = 
+				new Vector3(_trans.position.x + OffsetFromPlayer.x,
+				OffsetFromPlayer.y,
+				PlayerManager.Instance.PositionPlayer.z + OffsetFromPlayer.z);
 			yield return new WaitForEndOfFrame();
 		}
 	}
@@ -72,14 +83,17 @@ public class CameraBehaviour : MonoBehaviour {
 
 	private IEnumerator SwitchCarCam(Transform NextCar, float TimeSwitch, System.Action FuncAtEnd)
 	{
-		Vector3 BegPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, PlayerManager.Instance.TransPlayer.position.z + OffsetFromPlayer.z);
+		Vector3 BegPos = 
+			new Vector3(_trans.position.x + OffsetFromPlayer.x,
+			OffsetFromPlayer.y,
+			PlayerManager.Instance.PositionPlayer.z + OffsetFromPlayer.z);
 		Vector3 EndPos;
 
 		Debug.LogError(TimeSwitch);
 
 		for (float t = 0f; t < TimeSwitch; t += Time.unscaledDeltaTime)
 		{
-			Debug.LogError(t);
+			//Debug.LogError(t);
 			EndPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, NextCar.position.z + OffsetFromPlayer.z);
 			_trans.position = Vector3.Lerp(BegPos, EndPos, Mathf.Clamp01(t / TimeSwitch));
 			yield return null;

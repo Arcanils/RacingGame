@@ -52,14 +52,19 @@ public class GameplayManager : MonoBehaviour{
 			{
 				_listEntityApplyBehaviour[i].Invoke();
 			}
-
+			EnnemyManager.Instance.RefreshData();
 			CameraBehaviour.Instance.ApplyBehaviour();
 			yield return null;
 		}
 	}
 
-	public void AddBaseEntityInstance(Action Behaviour)
+	public void AddBehaviourEntity(Action Behaviour)
 	{
 		_listEntityApplyBehaviour.Add(Behaviour);
+	}
+
+	public void RemoveBehaviourEntity(Action Behaviour)
+	{
+		_listEntityApplyBehaviour.Remove(Behaviour);
 	}
 }

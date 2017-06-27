@@ -31,7 +31,7 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 		CurrentBody.SetPosition(Position);
 		CurrentBody.Init(transform, GetType().ToString() == "PlayerBehaviour");
 		CurrentBody.EventCollision += OnCollision;
-		GameplayManager.Instance.AddBaseEntityInstance(ApplyBehaviour);
+		GameplayManager.Instance.AddBehaviourEntity(ApplyBehaviour);
 	}
 	/*
 
@@ -51,10 +51,11 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 		//StartCoroutine(BehaviourEnum());
 	}
 
-	public void ApplyBehaviour()
+	public virtual void ApplyBehaviour()
 	{
 		_behaviourMove.MoveNext();
 	}
+
 	public IEnumerator BehaviourMoveEnum()
 	{
 		while (true)
@@ -70,4 +71,11 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 	{
 		return new Vector3(0f, 0f, _data.GetSpeedZ());
 	}
+
+	public void SelfDestroy()
+	{
+		GameplayManager.Instance.RemoveBehaviourEntity(ApplyBehaviour);
+		Destroy(gameObject);
+	}
+	
 }

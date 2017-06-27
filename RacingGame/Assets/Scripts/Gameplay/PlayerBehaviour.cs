@@ -22,7 +22,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 		{
 			_currentPowerCharge = Mathf.Clamp(value, 0, _data.PowerChargeMax);
 			if (EventChangePowerCharge != null)
-				EventChangePowerCharge(_currentPowerCharge);
+				EventChangePowerCharge(_currentPowerCharge  / _data.PowerChargeMax);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 			yield return null;
 		}
 	}
-	
+
 #if UNITY_STANDALONE || UNITY_EDITOR
 	protected override Vector3 GetVecSpeed()
 	{
@@ -70,7 +70,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 #else
 	protected override Vector3 GetVecSpeed()
 	{
-		return new Vector3(Input.acceleration.x * _data.SpeedSides, 0f, _data.Speed);
+		return new Vector3(Input.acceleration.x * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
 	}
 #endif
 
@@ -108,7 +108,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 
 	public void CallPowerUp()
 	{
-		if (!_modeSwitchOn)
+		if (!_modeSwitchOn && CurrentPowerCharge >= _data.PowerChargeMax)
 			StartCoroutine(SwitchCarEnum());
 	}
 
@@ -142,6 +142,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 	public void SwitchBody(BaseEntity NextBody, CarPlayerData Data)
 	{
 		_data.CarData = Data;
+		CurrentBody.SelfDestroy();
 		CurrentBody = NextBody;
 		CurrentBody.Init(transform, true);
 		_modeSwitchOn = false;
@@ -160,5 +161,11 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 	{
 		if (data.CurrentBonus == BonusData.TypeBonus.PowerCharge)
 			CurrentPowerCharge += data.Value;
+	}
+
+	public override void StartLogic()
+	{
+		base.StartLogic();
+		InitPower();
 	}
 }

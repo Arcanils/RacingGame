@@ -92,4 +92,15 @@ public class BaseEntity : MonoBehaviour
 		if (EventCollision != null)
 			EventCollision(collision);
 	}
+
+	public void SelfDestroy()
+	{
+		if (IsPlayer)
+		{
+			_col.enabled = false;
+			Destroy(gameObject, 5f);
+		}
+		else
+			Destroy(gameObject);
+	}
 }

@@ -19,7 +19,7 @@ public struct EnnemyConfig : EntityConfig
 	public float SpawnDistanceFromPlayer;
 	public bool ModeAleatoire;
 	public float LuckSpawnDouble;
-	public float TimeBeetweenSpawnAlea;
+	public float DistanceBeetweenSpawn;
 	public int LuckTruck;
 	public int LuckMoto;
 

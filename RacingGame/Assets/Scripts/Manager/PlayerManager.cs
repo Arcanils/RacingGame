@@ -5,11 +5,14 @@ using System;
 public class PlayerManager : MonoBehaviour {
 
 	public static PlayerManager Instance;
-	public Transform TransPlayer
+	public Vector3 PositionPlayer
 	{
 		get
 		{
-			return InstanceP != null && InstanceP.CurrentBody != null ? InstanceP.CurrentBody.transform : null;
+			if (!_powerTransition)
+				return InstanceP != null && InstanceP.CurrentBody != null ? InstanceP.CurrentBody.transform.position : Vector3.zero;
+			else
+				return CameraBehaviour.Instance.PositionPowerTransition;
 		}
 	}
 
@@ -19,6 +22,7 @@ public class PlayerManager : MonoBehaviour {
 
 
 	private PlayerConfig _config;
+	private bool _powerTransition;
 
 	public void Awake()
 	{
