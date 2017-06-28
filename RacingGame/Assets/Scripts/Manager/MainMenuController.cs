@@ -9,8 +9,13 @@ public class MainMenuController : MonoBehaviour {
 	public RectTransform ContainerUpgrade;
 	public GameObject PrefabPanelUpgrade;
 
+	public Transform Podium;
+	public Transform[] TargetsUpgrade;
+	public Transform[] SubPodiumTarget;
+	public float SpeedPodium = 36f;
 
 	private List<UIPanelUpgrade> _listPanelUpgrade;
+	private int _currentIndexTarget = -1;
 
 	public void Start()
 	{
@@ -18,6 +23,7 @@ public class MainMenuController : MonoBehaviour {
 		SaveManager.Init();
 		LoadData();
 		ResetUpgradeMenu();
+		StartCoroutine(BehaviourPodiumEnum());	
 	}
 
 	public void Play()
@@ -51,11 +57,15 @@ public class MainMenuController : MonoBehaviour {
 			ContainerUI.anchoredPosition = Vector2.Lerp(BegPos, EndPos, Mathf.SmoothStep(0, 1f, perc));
 			yield return null;
 		}
+
+		if (!In)
+			ResetUpgradeMenu();
 	}
 
 	private void ResetUpgradeMenu()
 	{
 		ContainerUpgrade.gameObject.SetActive(false);
+		_currentIndexTarget = -1;
 	}
 
 	private void LoadData()
@@ -74,6 +84,7 @@ public class MainMenuController : MonoBehaviour {
 
 	public void ShowSubMenuForCategory(int IndexCategory)
 	{
+		_currentIndexTarget = IndexCategory;
 		ContainerUpgrade.gameObject.SetActive(true);
 		for (int i = 0, iLength = _listPanelUpgrade.Count; i < iLength; i++)
 		{
@@ -82,8 +93,46 @@ public class MainMenuController : MonoBehaviour {
 	}
 	
 
-	private IEnumerator AnimationPodiumEnum()
+	private IEnumerator AnimationPodiumEnum(int indexTarget)
 	{
-		yield break;
+		if (indexTarget == -1 || indexTarget == 3)
+		{
+			while (true)
+			{
+				Podium.Rotate(Podium.up, SpeedPodium * Time.deltaTime, Space.Self);
+				yield return null;
+			}
+		}
+		else
+		{
+			Quaternion BegRot = Podium.rotation;
+			Quaternion EndRot = Quaternion.Euler((new Vector3(0, 120f, 0f)) * indexTarget);
+			for (float t = 0f, perc = 0f; perc < 1f; t+= Time.deltaTime)
+			{
+				perc = Mathf.Clamp01(t / 0.75f);
+				Podium.rotation = Quaternion.Slerp(BegRot, EndRot, perc);
+				yield return null;
+			}
+		}
 	}
+
+
+	private IEnumerator BehaviourPodiumEnum ()
+	{
+		int previousTarget = 0;
+		IEnumerator behaviour = null;
+		while (true)
+		{
+			while (_currentIndexTarget == previousTarget)
+			{
+				behaviour.MoveNext();
+				yield return null;
+			}
+
+			behaviour = AnimationPodiumEnum(_currentIndexTarget);
+			previousTarget = _currentIndexTarget;
+		}
+	}
+
+
 }

@@ -34,7 +34,7 @@ public class UIUpgrade : MonoBehaviour {
 			_tabImageBlockLvl[i].color = i < _upgrade.CurrentIndexValue ? Color.green : Color.gray;
 		}
 
-		PriceUpgrade.text = _upgrade.CurrentIndexValue < _upgrade.Values.Length ? _upgrade.Values[_upgrade.CurrentIndexValue] + "$" : "NONE";
+		PriceUpgrade.text = _upgrade.CurrentIndexValue < _upgrade.Values.Length ? _upgrade.Values[_upgrade.CurrentIndexValue].Price.ToString() + "$" : "NONE";
 	}
 
 	public void Buy()

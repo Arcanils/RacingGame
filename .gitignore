@@ -307,3 +307,7 @@ UnityTempFile-f554975f0a787844ab96015d7cfc3cad
 UnityTempFile-f9698eb824df69a4797cf88a68d6d804
 0.backup
 v15
+/RacingGame/Library/*.txt
+/RacingGame/Temp/*
+/RacingGame/Library/metadata/0a/*
+/RacingGame/Library/*
