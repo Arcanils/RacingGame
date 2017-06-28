@@ -37,7 +37,7 @@ public struct EnnemyConfig : EntityConfig
 }
 
 [System.Serializable]
-public struct EnnemyData : EntityData
+public struct EnnemyData : EntityData<EnnemyConfig>
 {
 	public CarEnnemyData CarData;
 
@@ -50,11 +50,17 @@ public struct EnnemyData : EntityData
 	{
 		return CarData.CurrentSpeedZ;
 	}
-
+	/*
 	public void Init(EntityData Data)
 	{
 		var newData = (EnnemyData)Data;
 		this.CarData = newData.CarData;
+		CarData.CurrentSpeedZ = (CarData.SpeedMin + CarData.SpeedMax) / 2f;
+	}
+	*/
+	public void Init(EnnemyConfig Data, int IndexStruct)
+	{
+		this.CarData = Data.ListEnnemyData[IndexStruct].CarData;
 		CarData.CurrentSpeedZ = (CarData.SpeedMin + CarData.SpeedMax) / 2f;
 	}
 }

@@ -3,16 +3,51 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 
-public class PlayerBehaviour : EntityBehaviour<PlayerData>{
+public class PlayerBehaviour : EntityBehaviour<PlayerConfig, PlayerData>{
 
-	public Action<float> EventChangeScore;
+	public Action<int> EventChangeScore;
 	public Action<int> EventChangeHP;
+	public Action<int> EventNewMaxHP; 
 	public Action<float> EventChangePowerCharge;
-	
+	public Action<int> EventChangeDistance;
 
-	private bool _modeSwitchOn = false;
+	public int CurrentDistance
+	{
+		get
+		{
+			return _currentDistance;
+		}
+		private set
+		{
+			if (value != _currentDistance)
+			{
+				_currentDistance = value;
+				if (EventChangeDistance != null)
+					EventChangeDistance.Invoke(value);
+			}
+		}
+	}
+	private int _currentDistance;
 
-	public float CurrentPowerCharge
+	public int CurrentScore
+	{
+		get
+		{
+			return _currentScore;
+		}
+		set
+		{
+			if (value != _currentScore)
+			{
+				_currentScore = value;
+				if (EventChangeScore != null)
+					EventChangeScore.Invoke(value);
+			}
+		}
+	}
+	private int _currentScore;
+
+public float CurrentPowerCharge
 	{
 		get
 		{
@@ -26,6 +61,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 		}
 	}
 
+	private bool _modeSwitchOn = false;
 	private float _currentPowerCharge;
 	/*
 	public void Init(PlayerConfig PConfig)
@@ -65,12 +101,14 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 #if UNITY_STANDALONE || UNITY_EDITOR
 	protected override Vector3 GetVecSpeed()
 	{
-		return new Vector3(Input.GetAxis("Horizontal") * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
+		var val = Input.GetAxis("Horizontal");
+		//Debug.LogError(_data.CurveControl);
+		return new Vector3(_data.CurveControl.Evaluate(Mathf.Abs(val)) * _data.CarData.SpeedSides * Mathf.Sign(val), 0f, _data.CarData.Speed);
 	}
 #else
 	protected override Vector3 GetVecSpeed()
 	{
-		return new Vector3(Input.acceleration.x * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
+		return new Vector3(_data.CurveControl.Evaluate(Input.acceleration.x) * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
 	}
 #endif
 
@@ -87,6 +125,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 
 	public void HitByEnnemy(EnnemyBehaviour Ennemy)
 	{
+		CurrentScore += (((int)(Ennemy.GetCarType()) + 1)) * 100;
 		if (!DamageLogic(Ennemy.GetValueDmg()))
 		{
 			//EndGame
@@ -97,8 +136,8 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 	public void ResetHP()
 	{
 		_data.CarData.CurrentHP = _data.CarData.HP;
-		if (EventChangeHP != null)
-			EventChangeHP.Invoke(_data.CarData.CurrentHP);
+		if (EventNewMaxHP != null)
+			EventNewMaxHP.Invoke(_data.CarData.HP);
 	}
 
 	public int GetHP()
@@ -134,14 +173,16 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 					}
 				}
 			}
-			yield return null;
+			do
+				yield return null;
+			while (UIGameplayManager.Instance.IsPaused);
 		}
 		Time.timeScale = 1.0f;
 	}
 
-	public void SwitchBody(BaseEntity NextBody, CarPlayerData Data)
+	public void SwitchBody(BaseEntity NextBody, PlayerConfig Config, int IndexStruct)
 	{
-		_data.CarData = Data;
+		_data.Init(Config, IndexStruct);
 		CurrentBody.SelfDestroy();
 		CurrentBody = NextBody;
 		CurrentBody.Init(transform, true);
@@ -167,5 +208,24 @@ public class PlayerBehaviour : EntityBehaviour<PlayerData>{
 	{
 		base.StartLogic();
 		InitPower();
+		StartCoroutine(DistanceEnum());
+	}
+
+	public IEnumerator DistanceEnum()
+	{
+		float Origine = CurrentBody.transform.position.z;
+		int CurrentKm = 0;
+		int NewValue = 0;
+		while (true)
+		{
+			NewValue = Mathf.RoundToInt((CurrentBody.transform.position.z - Origine) / 100f);
+			if (NewValue > CurrentKm)
+			{
+				CurrentKm = NewValue;
+
+				CurrentDistance += 1000;
+			}
+			yield return null;
+		}
 	}
 }

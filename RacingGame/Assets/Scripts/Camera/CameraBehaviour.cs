@@ -96,7 +96,10 @@ public class CameraBehaviour : MonoBehaviour {
 			//Debug.LogError(t);
 			EndPos = new Vector3(_trans.position.x + OffsetFromPlayer.x, OffsetFromPlayer.y, NextCar.position.z + OffsetFromPlayer.z);
 			_trans.position = Vector3.Lerp(BegPos, EndPos, Mathf.Clamp01(t / TimeSwitch));
-			yield return null;
+			do
+			{
+				yield return null;
+			}while (UIGameplayManager.Instance.IsPaused);
 		}
 
 		if (EventEndSwitchCar != null)

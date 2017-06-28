@@ -55,7 +55,7 @@ public class PlayerConfig : EntityConfig
 	}
 }
 
-public struct PlayerData : EntityData
+public struct PlayerData : EntityData<PlayerConfig>
 {
 	public CarPlayerData CarData;
 	public float PowerChargeBySec;
@@ -64,17 +64,19 @@ public struct PlayerData : EntityData
 	public float BegPowerCharge;
 	public bool UltimeEnable;
 	public bool ExploEnable;
-
-	public PlayerData(PlayerConfig Config, CarType Type)
+	public AnimationCurve CurveControl
 	{
-		this.CarData = Config.ListPlayerData.Find(element => element.CurrentCarType == Type);
-		this.PowerChargeBySec = Config.PowerChargeBySec;
-		this.PowerChargeMax = Config.PowerChargeMax;
-		this.BegPowerCharge = Config.BegPowerCharge;
-		this.UltimeEnable = false;
-		this.ExploEnable = false;
-		ApplyUpgrade(Config, Type);
+		get
+		{
+			return _curveControl;
+		}
+		set
+		{
+			_curveControl = value;
+		}
 	}
+	private AnimationCurve _curveControl;
+	
 
 	public void ApplyUpgrade(PlayerConfig Config, CarType Type)
 	{
@@ -98,7 +100,7 @@ public struct PlayerData : EntityData
 				}
 				else if (upgrades[i].NameAbility == "Control")
 				{
-					CarData.SpeedSides += (int)(upgrades[i].Values[index].Value);
+					CurveControl = CarData.CurveControl[index];
 				}
 				else if (upgrades[i].NameAbility == "Ultime")
 				{
@@ -137,13 +139,28 @@ public struct PlayerData : EntityData
 	{
 		return CarData.Speed;
 	}
-
+	/*
 	public void Init(EntityData Data)
 	{
+		Debug.LogError("NE DOIT PAS PASSER ICI");
 		var newData = (PlayerData)Data;
 		this.CarData = newData.CarData;
 		this.PowerChargeBySec = newData.PowerChargeBySec;
 		this.PowerChargeMax = newData.PowerChargeMax;
+	}*/
+
+	public void Init(PlayerConfig Data, int IndexStruct)
+	{
+		this.CarData = Data.ListPlayerData.Find(element => (int)element.CurrentCarType == IndexStruct);
+		this.PowerChargeBySec = Data.PowerChargeBySec;
+		this.PowerChargeMax = Data.PowerChargeMax;
+		this.BegPowerCharge = Data.BegPowerCharge;
+		this.UltimeEnable = false;
+		this.ExploEnable = false;
+		this._curveControl = this.CarData.CurveControl[0];
+		ApplyUpgrade(Data, (CarType)IndexStruct);
+		Debug.LogError(CarData.Speed);
+		this.CarData.CurrentHP = this.CarData.HP;
 	}
 }
 

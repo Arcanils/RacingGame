@@ -33,7 +33,7 @@ public struct BonusConfig : EntityConfig
 }
 
 [System.Serializable]
-public struct BonusData : EntityData
+public struct BonusData : EntityData<BonusConfig>
 {
 	public enum TypeBonus
 	{
@@ -71,7 +71,7 @@ public struct BonusData : EntityData
 			Debug.LogError("FAIL INIT " + e.Message);
 		}
 	}
-
+	/*
 	public void Init(EntityData Data)
 	{
 		var newData = (BonusData)Data;
@@ -79,4 +79,5 @@ public struct BonusData : EntityData
 		this.Value = newData.Value;
 		this.SpeedZ = newData.SpeedZ;
 	}
+	*/
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class BonusBehaviour : EntityBehaviour<BonusData>
+public class BonusBehaviour : EntityBehaviour<BonusConfig, BonusData>
 {
 	protected override void OnCollision(Collision collision)
 	{

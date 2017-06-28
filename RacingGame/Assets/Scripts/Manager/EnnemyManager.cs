@@ -147,7 +147,7 @@ private void SpawnInternPattern(int IndexInternPattern)
 			throw new System.Exception();
 		var type = _config.GetRandType();
 		script.ColumnCarIndex = IndexSpawnColumn;
-		script.Init(_config.ListEnnemyData.Find(element => element.CarData.CurrentCarType == type),
+		script.Init(_config, (int)type,
 			new Vector3(_posSpawn[IndexSpawnColumn].x,
 			_posSpawn[IndexSpawnColumn].y,
 			PlayerManager.Instance.PositionPlayer.z + _config.SpawnDistanceFromPlayer));
@@ -244,7 +244,7 @@ public class EntityPlacementManager
 		}
 	}
 
-	internal float GetCarFrontSpeed(EnnemyBehaviour ennemyBehaviour)
+	public float GetCarFrontSpeed(EnnemyBehaviour ennemyBehaviour)
 	{
 		int indexColumn = Mathf.CeilToInt(ennemyBehaviour.ColumnCarIndex / 2f);
 		var item = EntitiesPlacement[indexColumn].Find(element => element.RefEntity == ennemyBehaviour);
@@ -255,7 +255,7 @@ public class EntityPlacementManager
 			return item.RefNearEntities[1] != null ? item.RefNearEntities[1].GetSpeed() : 0f;
 	}
 
-	internal bool IsNearCar(EnnemyBehaviour ennemyBehaviour)
+	public bool IsNearCar(EnnemyBehaviour ennemyBehaviour)
 	{
 		int indexColumn = Mathf.CeilToInt(ennemyBehaviour.ColumnCarIndex / 2f);
 		var item = EntitiesPlacement[indexColumn].Find(element => element.RefEntity == ennemyBehaviour);

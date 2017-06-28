@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class EntityBehaviour<S> : MonoBehaviour 
-	where S : EntityData
+public abstract class EntityBehaviour<T,S> : MonoBehaviour
+	where T : EntityConfig
+	where S : EntityData<T>
 {
 	public BaseEntity CurrentBody { get; protected set; }
 
@@ -14,11 +15,11 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 		_behaviourMove = BehaviourMoveEnum();
 	}
 
-	public void Init(S Data, Vector3 Position)
+	public void Init(T Config, int IndexStruct, Vector3 Position)
 	{
-		InitData(Data);
+		InitData(Config, IndexStruct);
 		GameObject instancePool;
-		if (!PoolManager.Instance.GetObject(Data.GetIDPoolObject(), out instancePool))
+		if (!PoolManager.Instance.GetObject(_data.GetIDPoolObject(), out instancePool))
 		{
 			throw new System.Exception();
 		}
@@ -40,9 +41,9 @@ public abstract class EntityBehaviour<S> : MonoBehaviour
 		_config.Init(Config);
 	}
 	*/
-	protected void InitData(S Data)
+	protected void InitData(T Data, int IndexStruct)
 	{
-		_data.Init(Data);
+		_data.Init(Data, IndexStruct);
 	}
 
 

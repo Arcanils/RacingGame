@@ -41,8 +41,9 @@ public class PlayerManager : MonoBehaviour {
 		instancePool.transform.parent = Container;
 		instancePool.transform.localPosition = Vector3.zero;
 		InstanceP = instancePool.GetComponent<PlayerBehaviour>();
-		InstanceP.Init(new PlayerData(Config, Config.StartPlayer), Container.position);
-		InstanceP.ResetHP();
+		//var DataP = new PlayerData();
+		//DataP.Init(Config, (int)Config.StartPlayer); 
+		InstanceP.Init(Config, (int)Config.StartPlayer, Container.position);
 	}
 
 	public void StartLogic()
@@ -54,7 +55,7 @@ public class PlayerManager : MonoBehaviour {
 	public void SwitchBodyForPlayer(BaseEntity BodyEnnemy)
 	{
 		BodyEnnemy.Init(InstanceP.transform, true);
-		InstanceP.SwitchBody(BodyEnnemy, _config.ListPlayerData.Find(element => element.CurrentCarType == BodyEnnemy.Type));
+		InstanceP.SwitchBody(BodyEnnemy, _config, (int) BodyEnnemy.Type);
 		
 	}
 

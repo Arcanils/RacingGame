@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [System.Serializable]
 public struct CarEnnemyData
@@ -33,6 +34,8 @@ public struct CarPlayerData
 	public float Speed;
 	public float SpeedSides;
 
+	public List<AnimationCurve> CurveControl;
+
 
 	public void Init(CarPlayerData Data)
 	{
@@ -41,6 +44,7 @@ public struct CarPlayerData
 		this.CurrentHP = this.HP;
 		this.Speed = Data.Speed;
 		this.SpeedSides = Data.SpeedSides;
+		this.CurveControl = Data.CurveControl;
 	}
 }
 

@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class EnnemyBehaviour : EntityBehaviour<EnnemyData>
+public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 {
 	public int ColumnCarIndex;
 	public bool SlowState { get; private set; }
@@ -57,5 +57,10 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyData>
 	public float GetSpeed()
 	{
 		return _data.CarData.CurrentSpeedZ;
+	}
+
+	public CarType GetCarType()
+	{
+		return CurrentBody.Type;
 	}
 }
