@@ -28,8 +28,6 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyData>
 	{
 		if (!SlowState && EnnemyManager.Instance.IsNearCar(this))
 		{
-			Debug.LogError("!!");
-			Debug.Break();
 			SlowState = true;
 			_slowBehaviour = ApplySlowBehaviour(1f);
 		}

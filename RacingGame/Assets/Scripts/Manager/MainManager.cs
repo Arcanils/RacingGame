@@ -6,7 +6,6 @@ public class MainManager : MonoBehaviour {
 
 	public static MainManager Instance { get; private set; }
 
-	private const string _gameConfigPath = "Scriptable/GameConfig";
 
 	private DataConfig _config;
 
@@ -22,12 +21,7 @@ public class MainManager : MonoBehaviour {
 
 	public IEnumerator Init()
 	{
-		_config = Resources.Load<DataConfig>(_gameConfigPath);
-
-		if (_config == null)
-		{
-			throw new Exception();
-		}
+		_config = ConfigManager.Instance.Config;
 
 		PoolManager.Instance.Init();
 		RoadManager.Instance.Init(_config.AreaData);

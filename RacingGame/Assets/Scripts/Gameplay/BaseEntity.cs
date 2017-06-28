@@ -13,6 +13,7 @@ public class BaseEntity : MonoBehaviour
 	private Rigidbody _rigid;
 	private BoxCollider _col;
 	private Transform _trans;
+	private Material[] _mats;
 
 	private const float _demiLengthXRoad = 10f;
 
@@ -29,6 +30,15 @@ public class BaseEntity : MonoBehaviour
 		_rigid = GetComponent<Rigidbody>();
 		_col = GetComponent<BoxCollider>();
 		_limitX = _demiLengthXRoad - _col.size.x / 2f;
+		var meshs = GetComponentsInChildren<MeshRenderer>();
+		if (meshs != null)
+		{
+			_mats = new Material[meshs.Length];
+			for (int i = 0; i < meshs.Length; i++)
+			{
+				_mats[i] = meshs[i].material;
+			}
+		}
 	}
 
 	public void Init(Transform Parent, bool IsPlayer = false)
@@ -37,6 +47,10 @@ public class BaseEntity : MonoBehaviour
 		_rigid.constraints = RigidbodyConstraints.FreezeAll;
 		_trans.parent = Parent;
 		tag = IsPlayer ? "Player" : "Ennemy";
+		for (int i = 0; i < _mats.Length; i++)
+		{
+			_mats[i].color = IsPlayer ? Color.blue : Color.gray;
+		}
 	}
 
 	public void Move(Vector3 VecSpeed)

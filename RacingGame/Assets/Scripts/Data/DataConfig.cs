@@ -11,6 +11,9 @@ public class DataConfig : ScriptableObject
 	public PlayerScriptable PlayerData;
 	public BonusScriptable BonusData;
 	public CameraConfig CameraData;
+
+	[System.NonSerialized]
+	public float Currency = 100000;
 }
 
 [System.Serializable]
