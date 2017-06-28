@@ -12,7 +12,9 @@ public class UIPanelUpgrade : MonoBehaviour {
 	public void InitData(List<UpgradePlayer> Upgrades)
 	{
 		_listUI = new List<UIUpgrade>();
-		Vector2 size = new Vector2(ContainerUpgrade.rect.size.x, ContainerUpgrade.rect.y / 4);
+		Vector2 size = new Vector2(ContainerUpgrade.rect.size.x, ContainerUpgrade.rect.size.y / 5);
+		float space = size.y / 4;
+		
 		GameObject go;
 		RectTransform rt;
 		for (int i = 0, iLength = Upgrades.Count; i < iLength; i++)
@@ -21,6 +23,7 @@ public class UIPanelUpgrade : MonoBehaviour {
 			rt = go.transform as RectTransform;
 
 			rt.sizeDelta = size;
+			rt.anchoredPosition = new Vector2(0f, -(size.y + space) * i);
 			var script = go.GetComponent<UIUpgrade>();
 			script.InitData(Upgrades[i]);
 			_listUI.Add(script);

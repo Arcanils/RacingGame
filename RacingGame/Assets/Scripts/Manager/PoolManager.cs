@@ -67,7 +67,7 @@ public class Pool
 	public void InitPool(Transform ContainerPool)
 	{
 		CreateContainerPool(ContainerPool);
-		_canBeReturnedToPool = Prefab != null && Prefab.GetComponent<IPool>() != null;
+		_canBeReturnedToPool = Prefab != null && Prefab.GetComponent<PoolComponent>() != null;
 		for (int i = 0; i < NObject; i++)
 		{
 			_listObjs.Enqueue(CreateObject(false));
@@ -91,8 +91,8 @@ public class Pool
 
 		if (_canBeReturnedToPool)
 		{
-			var script = instance.GetComponent<IPool>();
-			script.InitFromPull(this);
+			var script = instance.GetComponent<PoolComponent>();
+			script.InitFromPool(this);
 		}
 		//_listObjs.Enqueue(instance);
 
@@ -114,8 +114,11 @@ public class Pool
 		return instance;
 	}
 
-	public void ReturnToPool()
+	public void ReturnToPool(PoolComponent ObjectPooled)
 	{
-
+		ObjectPooled.Reset();
+		ObjectPooled.gameObject.SetActive(false);
+		ObjectPooled.transform.SetParent(_container);
+		_listObjs.Enqueue(ObjectPooled.gameObject);
 	}
 }

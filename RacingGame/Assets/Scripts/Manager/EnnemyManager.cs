@@ -141,6 +141,7 @@ private void SpawnInternPattern(int IndexInternPattern)
 			throw new System.Exception();
 
 		var goTrans = go.transform;
+		goTrans.SetParent(Container);
 
 		var script = go.GetComponent<EnnemyBehaviour>();
 		if (!script)

@@ -14,6 +14,9 @@ public class MainMenuController : MonoBehaviour {
 	public Transform[] SubPodiumTarget;
 	public float SpeedPodium = 36f;
 
+	public float DurationFade = 1f;
+	public CanvasGroup CanvasFade;
+
 	private List<UIPanelUpgrade> _listPanelUpgrade;
 	private int _currentIndexTarget = -1;
 
@@ -23,12 +26,13 @@ public class MainMenuController : MonoBehaviour {
 		SaveManager.Init();
 		LoadData();
 		ResetUpgradeMenu();
+		StartCoroutine(FadeEnum(false, null));
 		StartCoroutine(BehaviourPodiumEnum());	
 	}
 
 	public void Play()
 	{
-		UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+		StartCoroutine(FadeEnum(true,() => UnityEngine.SceneManagement.SceneManager.LoadScene(1)));
 	}
 
 	public void Upgrade()
@@ -42,7 +46,8 @@ public class MainMenuController : MonoBehaviour {
 
 	public void Quit()
 	{
-		Application.Quit();
+		StartCoroutine(FadeEnum(true, () => Application.Quit()));
+		
 	}
 
 
@@ -134,5 +139,24 @@ public class MainMenuController : MonoBehaviour {
 		}
 	}
 
+	private IEnumerator FadeEnum(bool In, System.Action FctAtEnd)
+	{
+		float begValue = CanvasFade.alpha;
+		float endValue = In ? 1f : 0f;
 
+		if (In)
+			CanvasFade.gameObject.SetActive(true);
+
+		for (float t = 0f, perc = 0f; perc < 1f; t += Time.unscaledDeltaTime)
+		{
+			perc = Mathf.Abs(t / DurationFade);
+			CanvasFade.alpha = Mathf.Lerp(begValue, endValue, Mathf.SmoothStep(0f, 1f, perc));
+			yield return null;
+		}
+		if (!In)
+			CanvasFade.gameObject.SetActive(false);
+
+		if (FctAtEnd != null)
+			FctAtEnd.Invoke();
+	}
 }

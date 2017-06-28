@@ -15,6 +15,7 @@ public class UIGameplayManager : MonoBehaviour {
 	public string IDBlockLife = "BlockHP";
 	public Image PowerCharge;
 	public Text CenterScreenTxt;
+	public CanvasGroup CanvasFadeCenterTxt;
 	public Button PowerBut;
 	public Button PauseBut;
 
@@ -23,6 +24,14 @@ public class UIGameplayManager : MonoBehaviour {
 	public Button QuitBut;
 	public Button ResumeBut;
 	public Button HomeBut;
+
+	public CanvasGroup CanvasFade;
+	public float DurationFade = 1f;
+	public float DurationDecompte = 3f;
+
+	public RectTransform ContainerMenuEnd;
+	public Button QuitEndBut;
+	public Button ContinueEndBut;
 
 	private List<Image> _listImageBlockLife = new List<Image>();
 	private float _oldTimeScale;
@@ -42,8 +51,11 @@ public class UIGameplayManager : MonoBehaviour {
 
 		PowerBut.onClick.AddListener(PlayerManager.Instance.InstanceP.CallPowerUp);
 		QuitBut.onClick.AddListener(Quit);
-		ResumeBut.onClick.AddListener(() => SetActiveMenu(false));
-		HomeBut.onClick.AddListener(() => SetActiveMenu(true));
+		ResumeBut.onClick.AddListener(() => SetActiveMenu(ContainerMenuHome, false));
+		HomeBut.onClick.AddListener(() => SetActiveMenu(ContainerMenuHome, true));
+
+		QuitEndBut.onClick.AddListener(Quit);
+		ContinueEndBut.onClick.AddListener(ContinueAfterLoose);
 
 	}
 
@@ -98,7 +110,11 @@ public class UIGameplayManager : MonoBehaviour {
 	{
 		for (int i = 0; i < _listImageBlockLife.Count; i++)
 		{
-			Destroy(_listImageBlockLife[i].gameObject);
+			var script = _listImageBlockLife[i].GetComponent<PoolComponent>();
+			if (script != null)
+				script.BackToPool();
+			else
+				Destroy(_listImageBlockLife[i].gameObject);
 		}
 
 		_listImageBlockLife.Clear();
@@ -110,17 +126,24 @@ public class UIGameplayManager : MonoBehaviour {
 	}
 
 
-	public void SetActiveMenu(bool SetActive)
+	public void SetActiveMenu(RectTransform Container, bool SetActive, System.Action ActionAtEnd = null)
 	{
-		StartCoroutine(ShowMenu(SetActive));
+		StartCoroutine(ShowMenu(Container, SetActive, ActionAtEnd));
 	}
 
 	public void Quit()
 	{
+		StartCoroutine(QuitEnum());
+	}
+
+	private IEnumerator QuitEnum()
+	{
+		yield return FadeEnum(true);
+		Time.timeScale = 1f;
 		UnityEngine.SceneManagement.SceneManager.LoadScene(0);
 	}
 
-	public IEnumerator ShowMenu(bool In)
+	public IEnumerator ShowMenu(RectTransform Container, bool In, System.Action ActionAtEnd)
 	{
 		if (In)
 		{
@@ -128,17 +151,17 @@ public class UIGameplayManager : MonoBehaviour {
 			_oldTimeScale = Time.timeScale;
 			Time.timeScale = 0f;
 			Mask.SetActive(true);
-			ContainerMenuHome.gameObject.SetActive(true);
+			Container.gameObject.SetActive(true);
 		}
 
-		Vector2 BegPosition = ContainerMenuHome.anchoredPosition;
+		Vector2 BegPosition = Container.anchoredPosition;
 		Vector2 EndPosition = In ? new Vector2(0f, Screen.height) : Vector2.zero;
 
 		for (float t = 0f, perc = 0f; perc < 1f; t += Time.unscaledDeltaTime)
 		{
 			perc = Mathf.Clamp01(t / 1f);
 
-			ContainerMenuHome.anchoredPosition = Vector2.Lerp(BegPosition, EndPosition, Mathf.SmoothStep(0f, 1f, perc));
+			Container.anchoredPosition = Vector2.Lerp(BegPosition, EndPosition, Mathf.SmoothStep(0f, 1f, perc));
 			yield return null;
 		}
 
@@ -147,7 +170,50 @@ public class UIGameplayManager : MonoBehaviour {
 			Time.timeScale = _oldTimeScale;
 			IsPaused = false;
 			Mask.SetActive(false);
-			ContainerMenuHome.gameObject.SetActive(false);
+			Container.gameObject.SetActive(false);
 		}
+		if (ActionAtEnd != null)
+			ActionAtEnd.Invoke();
+	}
+
+	private IEnumerator FadeEnum(bool In)
+	{
+
+		float begValue = CanvasFade.alpha;
+		float endValue = In ? 1f : 0f;
+
+		if (In)
+			CanvasFade.gameObject.SetActive(true);
+
+		for (float t = 0f, perc = 0f; perc < 1f; t += Time.unscaledDeltaTime)
+		{
+			perc = Mathf.Abs(t / DurationFade);
+			CanvasFade.alpha = Mathf.Lerp(begValue, endValue, Mathf.SmoothStep(0f, 1f, perc));
+			yield return null;
+		}
+
+	}
+
+	public IEnumerator StartGame()
+	{
+		yield return FadeEnum(false);
+		CanvasFadeCenterTxt.alpha = 1f;
+		for (float t = 0f; t < 3f; t += Time.unscaledDeltaTime)
+		{
+			CenterScreenTxt.text = Mathf.Clamp((DurationDecompte - t), 0f, DurationDecompte).ToString("0.00");
+			yield return null;
+		}
+		CanvasFadeCenterTxt.alpha = 0f;
+		CenterScreenTxt.text = "";
+		CanvasFade.gameObject.SetActive(false);
+	}
+
+	public void ContinueAfterLoose()
+	{
+		SetActiveMenu(ContainerMenuEnd, false, PlayerManager.Instance.InstanceP.ResetHP);
+	}
+	public void ShowEndScreen()
+	{
+		SetActiveMenu(ContainerMenuEnd, true);
 	}
 }

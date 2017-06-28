@@ -27,11 +27,7 @@ public class MainManager : MonoBehaviour {
 		RoadManager.Instance.Init(_config.AreaData);
 		GameplayManager.Instance.Init(_config.PlayerData.Config, _config.EnnemyData.Config, _config.CameraData);
 		UIGameplayManager.Instance.Init();
-
-		//FadeOut
-		//Decompte
-		//Player play
-		//SpawnEnnemy Play
+		yield return UIGameplayManager.Instance.StartGame();
 		GameplayManager.Instance.StartLogic();
 		RoadManager.Instance.StartLogic();
 

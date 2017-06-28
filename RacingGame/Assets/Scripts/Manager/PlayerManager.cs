@@ -8,11 +8,14 @@ public class PlayerManager : MonoBehaviour {
 	public Vector3 PositionPlayer
 	{
 		get
-		{
-			if (!_powerTransition)
+		{/*
+			if (!PowerTransition)
 				return InstanceP != null && InstanceP.CurrentBody != null ? InstanceP.CurrentBody.transform.position : Vector3.zero;
 			else
 				return CameraBehaviour.Instance.PositionPowerTransition;
+				*/
+
+			return InstanceP != null && InstanceP.CurrentBody != null ? InstanceP.CurrentBody.transform.position : Vector3.zero;
 		}
 	}
 
@@ -22,7 +25,7 @@ public class PlayerManager : MonoBehaviour {
 
 
 	private PlayerConfig _config;
-	private bool _powerTransition;
+	public bool PowerTransition;
 
 	public void Awake()
 	{
@@ -54,6 +57,7 @@ public class PlayerManager : MonoBehaviour {
 
 	public void SwitchBodyForPlayer(BaseEntity BodyEnnemy)
 	{
+		PowerTransition = false;
 		BodyEnnemy.Init(InstanceP.transform, true);
 		InstanceP.SwitchBody(BodyEnnemy, _config, (int) BodyEnnemy.Type);
 		

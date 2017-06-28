@@ -19,15 +19,13 @@ public class CameraBehaviour : MonoBehaviour {
 		}
 	}
 
-
-	private Camera _cam;
+	
 	private Transform _trans;
 	private IEnumerator _fctSwitch;
 	private IEnumerator _fctBehaviour;
 	public void Awake()
 	{
 		Instance = this;
-		_cam = GetComponent<Camera>();
 		_trans = transform;
 
 	}
@@ -83,6 +81,7 @@ public class CameraBehaviour : MonoBehaviour {
 
 	private IEnumerator SwitchCarCam(Transform NextCar, float TimeSwitch, System.Action FuncAtEnd)
 	{
+		PlayerManager.Instance.PowerTransition = true;
 		Vector3 BegPos = 
 			new Vector3(_trans.position.x + OffsetFromPlayer.x,
 			OffsetFromPlayer.y,

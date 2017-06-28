@@ -14,7 +14,7 @@ public class BaseEntity : MonoBehaviour
 	private BoxCollider _col;
 	private Transform _trans;
 	private Material[] _mats;
-
+	private PoolComponent _poolComponent;
 	private const float _demiLengthXRoad = 10f;
 
 	public void SetPosition(Vector3 position)
@@ -43,6 +43,14 @@ public class BaseEntity : MonoBehaviour
 
 	public void Init(Transform Parent, bool IsPlayer = false)
 	{
+		if (_poolComponent == null)
+		{
+			_poolComponent = GetComponent<PoolComponent>();
+			if (_poolComponent != null)
+			{
+				_poolComponent.OnResetToPool += OnResetToPool;
+			}
+		}
 		this.IsPlayer = IsPlayer;
 		_rigid.constraints = RigidbodyConstraints.FreezeAll;
 		_trans.parent = Parent;
@@ -112,9 +120,20 @@ public class BaseEntity : MonoBehaviour
 		if (IsPlayer)
 		{
 			_col.enabled = false;
-			Destroy(gameObject, 5f);
+			if (_poolComponent != null)
+				_poolComponent.BackToPool(5f);
+			else
+				Destroy(gameObject);
 		}
+		else if (_poolComponent != null)
+			_poolComponent.BackToPool();
 		else
 			Destroy(gameObject);
+	}
+
+	public void OnResetToPool()
+	{
+		if (_poolComponent != null)
+			_poolComponent.OnResetToPool -= OnResetToPool;
 	}
 }

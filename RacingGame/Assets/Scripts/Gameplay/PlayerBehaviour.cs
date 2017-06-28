@@ -108,7 +108,8 @@ public float CurrentPowerCharge
 #else
 	protected override Vector3 GetVecSpeed()
 	{
-		return new Vector3(_data.CurveControl.Evaluate(Input.acceleration.x) * _data.CarData.SpeedSides, 0f, _data.CarData.Speed);
+		var val = Input.acceleration.x;
+		return new Vector3(_data.CurveControl.Evaluate(Math.Abs(val)) * _data.CarData.SpeedSides * Mathf.Sign(val), 0f, _data.CarData.Speed);
 	}
 #endif
 
@@ -129,7 +130,7 @@ public float CurrentPowerCharge
 		if (!DamageLogic(Ennemy.GetValueDmg()))
 		{
 			//EndGame
-			SceneManager.LoadScene(0);
+			UIGameplayManager.Instance.ShowEndScreen();
 		}
 	}
 
@@ -177,7 +178,11 @@ public float CurrentPowerCharge
 				yield return null;
 			while (UIGameplayManager.Instance.IsPaused);
 		}
-		Time.timeScale = 1.0f;
+
+		_modeSwitchOn = false;
+		CurrentPowerCharge = 0f;
+
+		StartCoroutine(BackSlerpToRealTimeScale());
 	}
 
 	public void SwitchBody(BaseEntity NextBody, PlayerConfig Config, int IndexStruct)
@@ -186,10 +191,24 @@ public float CurrentPowerCharge
 		CurrentBody.SelfDestroy();
 		CurrentBody = NextBody;
 		CurrentBody.Init(transform, true);
-		_modeSwitchOn = false;
 		ResetHP();
+		_modeSwitchOn = false;
 		CurrentPowerCharge = 0f;
-		Time.timeScale = 1.0f;
+		//Time.timeScale = 1.0f;
+		StartCoroutine(BackSlerpToRealTimeScale());
+	}
+
+	private IEnumerator BackSlerpToRealTimeScale()
+	{
+		float begTime = Time.timeScale;
+		float endTime = 1f;
+
+		for (float t = 0f, perc = 0f; perc < 1f; t += Time.unscaledDeltaTime)
+		{
+			perc = Mathf.Clamp01(t / 1f);
+			Time.timeScale = Mathf.Lerp(begTime, endTime, Mathf.SmoothStep(0f, 1f, perc));
+			yield return null;
+		}
 	}
 
 	protected override void OnCollision(Collision collision)
@@ -214,16 +233,15 @@ public float CurrentPowerCharge
 	public IEnumerator DistanceEnum()
 	{
 		float Origine = CurrentBody.transform.position.z;
-		int CurrentKm = 0;
 		int NewValue = 0;
 		while (true)
 		{
 			NewValue = Mathf.RoundToInt((CurrentBody.transform.position.z - Origine) / 100f);
-			if (NewValue > CurrentKm)
+			if (NewValue > CurrentDistance)
 			{
-				CurrentKm = NewValue;
+				CurrentDistance = NewValue;
 
-				CurrentDistance += 1000;
+				CurrentScore += 1000;
 			}
 			yield return null;
 		}

@@ -9,7 +9,7 @@ public abstract class EntityBehaviour<T,S> : MonoBehaviour
 
 	protected S _data;
 	protected IEnumerator _behaviourMove;
-
+	protected PoolComponent _poolComponent;
 	public void Awake()
 	{
 		_behaviourMove = BehaviourMoveEnum();
@@ -23,7 +23,9 @@ public abstract class EntityBehaviour<T,S> : MonoBehaviour
 		{
 			throw new System.Exception();
 		}
-
+		_poolComponent = GetComponent<PoolComponent>();
+		if (_poolComponent != null)
+			_poolComponent.OnResetToPool += OnResetToPool;
 		CurrentBody = instancePool.GetComponent<BaseEntity>();
 
 		if (CurrentBody == null)
@@ -75,8 +77,21 @@ public abstract class EntityBehaviour<T,S> : MonoBehaviour
 
 	public void SelfDestroy()
 	{
-		GameplayManager.Instance.RemoveBehaviourEntity(ApplyBehaviour);
-		Destroy(gameObject);
+		if (_poolComponent != null)
+			_poolComponent.BackToPool();
+		else
+		{
+			GameplayManager.Instance.RemoveBehaviourEntity(ApplyBehaviour);
+			Destroy(gameObject);
+		}
 	}
-	
+
+	protected virtual void OnResetToPool()
+	{
+		GameplayManager.Instance.RemoveBehaviourEntity(ApplyBehaviour);
+		if (_poolComponent != null)
+			_poolComponent.OnResetToPool -= OnResetToPool;
+	}
+
+
 }
