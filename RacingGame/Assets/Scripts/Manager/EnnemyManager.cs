@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+///		Ennemy's Manager 
+/// </summary>
 public class EnnemyManager : MonoBehaviour {
 
 	public static EnnemyManager Instance { get; private set; }
@@ -14,6 +17,7 @@ public class EnnemyManager : MonoBehaviour {
 	private bool[] _previousSpawn;
 	private bool[] _nextSpawn;
 	private Vector2[] _posSpawn;
+	
 	private EntityPlacementManager _entityPlacementManager;
 
 	public void Awake()
@@ -43,12 +47,19 @@ public class EnnemyManager : MonoBehaviour {
 
 	public bool IsNearCar(EnnemyBehaviour ennemyBehaviour)
 	{
-		return (_entityPlacementManager.IsNearCar(ennemyBehaviour));
+		if (ennemyBehaviour == null || ennemyBehaviour.CurrentBody == null)
+			return false;
+		else
+			return (_entityPlacementManager.IsNearCar(ennemyBehaviour));
 	}
 
 	public float GetCarFrontSpeed(EnnemyBehaviour ennemyBehaviour)
 	{
 		return (_entityPlacementManager.GetCarFrontSpeed(ennemyBehaviour));
+	}
+	public EnnemyBehaviour GetFrontCar(EnnemyBehaviour ennemyBehaviour)
+	{
+		return (_entityPlacementManager.GetFrontCar(ennemyBehaviour));
 	}
 
 	/*
@@ -164,6 +175,9 @@ private void SpawnInternPattern(int IndexInternPattern)
 	}
 }
 
+/// <summary>
+///		Holder ennemies ref next to a ennemy ref
+/// </summary>
 public class EntityPlacement
 {
 	public enum TypeRefPlacement
@@ -190,6 +204,9 @@ public class EntityPlacement
 	}
 }
 
+/// <summary>
+///		Holder order beetween ennemy spawned
+/// </summary>
 public class EntityPlacementManager
 {
 	public List<EntityPlacement>[] EntitiesPlacement;
@@ -232,11 +249,12 @@ public class EntityPlacementManager
 			int j = 0;
 			while (j < EntitiesPlacement[i].Count)
 			{
-				if (EntitiesPlacement[i][j] == null || EntitiesPlacement[i][j].RefEntity == null)
+				if (EntitiesPlacement[i][j] == null || EntitiesPlacement[i][j].RefEntity == null ||
+					!EntitiesPlacement[i][j].RefEntity.gameObject.activeInHierarchy)
 					EntitiesPlacement[i].RemoveAt(j);
-   				if (EntitiesPlacement[i][j].RefEntity == null || EntitiesPlacement[i][j].GetPos().z + 20f < PosPlayerZ)
+   				else if (EntitiesPlacement[i][j].GetPos().z + 20f < PosPlayerZ)
 				{
-					EntitiesPlacement[i][j].RefEntity.SelfDestroy();
+					EntitiesPlacement[i][j].RefEntity.SelfDestroy(true);
 					EntitiesPlacement[i].RemoveAt(j);
 				}
 				else
@@ -256,6 +274,18 @@ public class EntityPlacementManager
 			return item.RefNearEntities[1] != null ? item.RefNearEntities[1].GetSpeed() : 0f;
 	}
 
+
+	public EnnemyBehaviour GetFrontCar(EnnemyBehaviour ennemyBehaviour)
+	{
+		int indexColumn = Mathf.CeilToInt(ennemyBehaviour.ColumnCarIndex / 2f);
+		var item = EntitiesPlacement[indexColumn].Find(element => element.RefEntity == ennemyBehaviour);
+
+		if (item == null)
+			return null;
+		else
+			return item.RefNearEntities[1];
+	}
+
 	public bool IsNearCar(EnnemyBehaviour ennemyBehaviour)
 	{
 		int indexColumn = Mathf.CeilToInt(ennemyBehaviour.ColumnCarIndex / 2f);
@@ -264,8 +294,8 @@ public class EntityPlacementManager
 		if (item == null)
 			return false;
 		else
-			return item.RefNearEntities[1] != null ? 
-				item.RefNearEntities[1].CurrentBody.transform.position.z - ennemyBehaviour.CurrentBody.transform.position.z <= 20 :
+			return item.RefNearEntities[1] != null  && item.RefNearEntities[1].CurrentBody != null ? 
+				item.RefNearEntities[1].CurrentBody.transform.position.z - ennemyBehaviour.CurrentBody.transform.position.z <= 25 :
 				false;
 	}
 }

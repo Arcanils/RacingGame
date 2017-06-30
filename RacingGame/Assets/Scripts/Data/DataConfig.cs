@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+///		Holder of the config of the game
+/// </summary>
 [CreateAssetMenu(fileName = "Config", menuName = "Scriptable/Config", order = 1)]
 public class DataConfig : ScriptableObject
 { 
@@ -11,11 +14,13 @@ public class DataConfig : ScriptableObject
 	public PlayerScriptable PlayerData;
 	public BonusScriptable BonusData;
 	public CameraConfig CameraData;
-
-	[System.NonSerialized]
-	public float Currency = 100000;
+	
 }
 
+
+/// <summary>
+///		Config of the road
+/// </summary>
 [System.Serializable]
 public struct AreaConfig
 {
@@ -26,7 +31,9 @@ public struct AreaConfig
 
 
 
-
+/// <summary>
+///		Config of the camera
+/// </summary>
 [System.Serializable]
 public struct CameraConfig
 {

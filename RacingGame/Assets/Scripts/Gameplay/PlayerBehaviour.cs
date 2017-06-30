@@ -3,6 +3,9 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 
+/// <summary>
+///		Player's Controller
+/// </summary>
 public class PlayerBehaviour : EntityBehaviour<PlayerConfig, PlayerData>{
 
 	public Action<int> EventChangeScore;
@@ -47,7 +50,7 @@ public class PlayerBehaviour : EntityBehaviour<PlayerConfig, PlayerData>{
 	}
 	private int _currentScore;
 
-public float CurrentPowerCharge
+	public float CurrentPowerCharge
 	{
 		get
 		{
@@ -63,25 +66,6 @@ public float CurrentPowerCharge
 
 	private bool _modeSwitchOn = false;
 	private float _currentPowerCharge;
-	/*
-	public void Init(PlayerConfig PConfig)
-	{
-		_config = PConfig;
-
-		this._data.Init(PConfig.ListPlayerData.Find(element => element.CurrentCarType == PConfig.StartPlayer));
-		GameObject instancePool;
-		if (!PoolManager.Instance.GetObject(_data.CurrentCarType.ToString() + "Part", out instancePool))
-		{
-			throw new System.Exception();
-		}
-
-		_currentBody = instancePool.GetComponent<BaseEntity>();
-
-		if (_currentBody == null)
-			throw new System.Exception();
-
-		_currentBody.Init(transform, true);
-	}*/
 
 	private void InitPower()
 	{
@@ -99,10 +83,13 @@ public float CurrentPowerCharge
 	}
 
 #if UNITY_STANDALONE || UNITY_EDITOR
+	/// <summary>
+	///		Smooth value with curve. Better control overall
+	/// </summary>
+	/// <returns></returns>
 	protected override Vector3 GetVecSpeed()
 	{
 		var val = Input.GetAxis("Horizontal");
-		//Debug.LogError(_data.CurveControl);
 		return new Vector3(_data.CurveControl.Evaluate(Mathf.Abs(val)) * _data.CarData.SpeedSides * Mathf.Sign(val), 0f, _data.CarData.Speed);
 	}
 #else
@@ -113,14 +100,16 @@ public float CurrentPowerCharge
 	}
 #endif
 
-
+	/// <summary>
+	///		Aplly damage
+	/// </summary>
+	/// <param name="Damage"></param>
+	/// <returns></returns>
 	public bool DamageLogic(int Damage)
 	{
 		_data.CarData.CurrentHP -= Damage;
 		if (EventChangeHP != null)
 			EventChangeHP.Invoke(_data.CarData.CurrentHP);
-		Debug.LogError("Damage / End :" + _data.CarData.CurrentHP);
-		//TextEndurance.text = "Endurance : " + _currentHP.ToString() + "%";
 		return _data.CarData.CurrentHP > 0;
 	}
 
@@ -213,7 +202,7 @@ public float CurrentPowerCharge
 
 	protected override void OnCollision(Collision collision)
 	{
-		Debug.LogError("Collision from Player");
+		//Debug.LogError("Collision from Player");
 	}
 
 

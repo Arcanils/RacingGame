@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+///		Manager of the road. None gameplay
+/// </summary>
 public class RoadManager : MonoBehaviour {
 
 	public static RoadManager Instance { get; private set; }

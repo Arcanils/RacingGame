@@ -39,11 +39,11 @@ public class UIUpgrade : MonoBehaviour {
 
 	public void Buy()
 	{
-		var value = ConfigManager.Instance.Config.Currency;
-		if (_upgrade.UpgradeIfPossible(value))
+		if (_upgrade.CanUpgrade() && SaveManager.Instance.Data.RemoveCurrency((int)_upgrade.GetValueNextUpgrade()))
 		{
+			_upgrade.Upgrade();
 			UpdateData();
-			SaveManager.Instance.UpdateDataAndSave();
+			MainMenuController.Instance.UpdateCurrency();
 		}
 	}
 }

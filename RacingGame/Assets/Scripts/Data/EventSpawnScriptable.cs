@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+///		Holder LD spawn (not implemented / used)
+/// </summary>
 [CreateAssetMenu(fileName = "EventSpawn", menuName = "Scriptable/EventSpawn", order = 1)]
 public class EventSpawnScriptable : ScriptableObject {
 

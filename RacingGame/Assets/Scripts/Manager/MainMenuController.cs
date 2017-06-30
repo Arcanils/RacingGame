@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
+/// <summary>
+///		Main of the start menu and upgrade menu
+/// </summary>
 public class MainMenuController : MonoBehaviour {
+
+	public static MainMenuController Instance { get; private set; }
 
 	public RectTransform ContainerUI;
 	public float DurationTransitionUI = 1f;
@@ -17,14 +23,22 @@ public class MainMenuController : MonoBehaviour {
 	public float DurationFade = 1f;
 	public CanvasGroup CanvasFade;
 
+	public Text CurrencyText;
+
 	private List<UIPanelUpgrade> _listPanelUpgrade;
 	private int _currentIndexTarget = -1;
+
+	public void Awake()
+	{
+		Instance = this;
+	}
 
 	public void Start()
 	{
 		ConfigManager.Init();
 		SaveManager.Init();
 		LoadData();
+		UpdateCurrency();
 		ResetUpgradeMenu();
 		StartCoroutine(FadeEnum(false, null));
 		StartCoroutine(BehaviourPodiumEnum());	
@@ -50,6 +64,10 @@ public class MainMenuController : MonoBehaviour {
 		
 	}
 
+	public void UpdateCurrency()
+	{
+		CurrencyText.text = SaveManager.Instance.Data.Currency + " $";
+	}
 
 	private IEnumerator AnimationTransitionMenuToUpgrade(bool In)
 	{

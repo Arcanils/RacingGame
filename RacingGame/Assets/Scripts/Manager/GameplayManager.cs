@@ -44,6 +44,11 @@ public class GameplayManager : MonoBehaviour{
 		StartCoroutine(GameplayLogicEnum());
 	}
 
+	/// <summary>
+	///		Pipeline logic.
+	///		Process entities first, enemymanagerData second and camera third
+	/// </summary>
+	/// <returns></returns>
 	private IEnumerator GameplayLogicEnum()
 	{
 		while(true)

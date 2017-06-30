@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+///		Data for the ennemy's car
+/// </summary>
 [System.Serializable]
 public struct CarEnnemyData
 {
@@ -24,6 +27,9 @@ public struct CarEnnemyData
 	}
 }
 
+/// <summary>
+///		Data for player's car
+/// </summary>
 [System.Serializable]
 public struct CarPlayerData
 {
@@ -34,6 +40,9 @@ public struct CarPlayerData
 	public float Speed;
 	public float SpeedSides;
 
+	/// <summary>
+	///		Curve of control apply on the speed left / right
+	/// </summary>
 	public List<AnimationCurve> CurveControl;
 
 

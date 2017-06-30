@@ -2,14 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public interface IPool
-{
-	GameObject Prefab { get; set; }
-	void InitFromPull(Pool Creator);
-
-	void ReturnToPool();
-}
-
+/// <summary>
+///		Pool manager. Use it for evade GC
+/// </summary>
 public class PoolManager : MonoBehaviour
 {
 	public static PoolManager Instance { get; private set; }
@@ -52,6 +47,9 @@ public class PoolManager : MonoBehaviour
 	}
 }
 
+/// <summary>
+///		Pool of prefab object set
+/// </summary>
 [System.Serializable]
 public class Pool
 {

@@ -3,6 +3,9 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+///		Config of all bonus of the game (none implemented)
+/// </summary>
 [CreateAssetMenu(fileName = "BonusData", menuName = "Scriptable/BonusData", order = 1)]
 public class BonusScriptable : ScriptableObject
 {
@@ -46,10 +49,10 @@ public struct BonusData : EntityData<BonusConfig>
 	public TypeBonus CurrentBonus;
 	public float Value;
 	public float SpeedZ;
-
+	private const string _id = "Bonus";
 	public string GetIDPoolObject()
 	{
-		return "Bonus" + CurrentBonus.ToString();
+		return _id + CurrentBonus.ToString();
 	}
 
 	public float GetSpeedZ()
@@ -71,13 +74,4 @@ public struct BonusData : EntityData<BonusConfig>
 			Debug.LogError("FAIL INIT " + e.Message);
 		}
 	}
-	/*
-	public void Init(EntityData Data)
-	{
-		var newData = (BonusData)Data;
-		this.CurrentBonus = newData.CurrentBonus;
-		this.Value = newData.Value;
-		this.SpeedZ = newData.SpeedZ;
-	}
-	*/
 }

@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+///		Holder of the ennemy's config
+/// </summary>
 [CreateAssetMenu(fileName = "EnnemyData", menuName = "Scriptable/EnnemyData", order = 2)]
 public class EnnemyScriptable : ScriptableObject {
 
@@ -10,6 +13,9 @@ public class EnnemyScriptable : ScriptableObject {
 
 }
 
+/// <summary>
+///		Ennemy's config
+/// </summary>
 [System.Serializable]
 public struct EnnemyConfig : EntityConfig
 {
@@ -36,6 +42,9 @@ public struct EnnemyConfig : EntityConfig
 	}
 }
 
+/// <summary>
+///		Ennemy's Data
+/// </summary>
 [System.Serializable]
 public struct EnnemyData : EntityData<EnnemyConfig>
 {

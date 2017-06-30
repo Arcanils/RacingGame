@@ -2,6 +2,10 @@
 using System.Collections;
 using System;
 
+
+/// <summary>
+///		Main of the game
+/// </summary>
 public class MainManager : MonoBehaviour {
 
 	public static MainManager Instance { get; private set; }

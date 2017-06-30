@@ -58,6 +58,7 @@ public class PlayerManager : MonoBehaviour {
 	public void SwitchBodyForPlayer(BaseEntity BodyEnnemy)
 	{
 		PowerTransition = false;
+		BodyEnnemy.transform.parent.GetComponent<EnnemyBehaviour>().SelfDestroy(false);
 		BodyEnnemy.Init(InstanceP.transform, true);
 		InstanceP.SwitchBody(BodyEnnemy, _config, (int) BodyEnnemy.Type);
 		

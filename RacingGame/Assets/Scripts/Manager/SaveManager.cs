@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 using System.IO;
 using System;
 
+/// <summary>
+///  Manager of save of the game
+/// </summary>
 [System.Serializable]
 public class SaveManager : MonoBehaviour
 {
@@ -22,14 +25,6 @@ public class SaveManager : MonoBehaviour
 
 	public HolderSave Data;
 
-	private const string _namefile = "/Save.txt";
-	private static string _path
-	{
-		get
-		{
-			return Application.persistentDataPath + _namefile;
-		}
-	}
 	public static void Init()
 	{
 		if (_instance == null)
@@ -42,15 +37,15 @@ public class SaveManager : MonoBehaviour
 		DontDestroyOnLoad(go);
 		_instance = go.GetComponent<SaveManager>();
 
-		if (File.Exists(_path))
+		if (HolderSave.FilesaveExist())
 		{
-			_instance.Data = HolderSave.Load(_path);
+			_instance.Data = HolderSave.Load();
 			Debug.LogError("LoadSuccess");
 		}
 		else
 		{
 			_instance.Data = new HolderSave();
-			_instance.Data.Save(_path);
+			_instance.Data.Save();
 			Debug.LogError("LoadFail");
 		}
 
@@ -60,7 +55,7 @@ public class SaveManager : MonoBehaviour
 	public void UpdateDataAndSave()
 	{
 		Data.UpgradeProgress.UpdateData(ConfigManager.Instance.Config.PlayerData.Config.ListTypeUpgrade);
-		Data.Save(_path);
+		Data.Save();
 	}
 }
 
@@ -68,8 +63,23 @@ public class SaveManager : MonoBehaviour
 public class HolderSave
 {
 	//Score
-	//Currency
 	public SaveUpgradeProgress UpgradeProgress;
+	//Currency
+	public float Currency
+	{
+		get
+		{
+			return _currency;
+		}
+		private set
+		{
+			_currency = value;
+		}
+	}
+	[SerializeField]
+	private float _currency;
+	private const string _namefile = "/Save.txt";
+
 
 	public HolderSave()
 	{
@@ -79,23 +89,53 @@ public class HolderSave
 
 	public void ApplyData()
 	{
-		ConfigManager.Instance.UpdateData(UpgradeProgress);
+		ConfigManager.Instance.UpdateData(this);
 	}
 
-
-	public void Save(string path)
+	public void AddCurrency(int Value)
 	{
-		var serializer = new XmlSerializer(typeof(HolderSave));
-		using (var stream = new FileStream(path, FileMode.Create))
+		_currency += Value;
+
+		Save();
+	}
+
+	public bool RemoveCurrency(int Value)
+	{
+		if (Currency < Value)
+			return false;
+
+		_currency -= Value;
+		Save();
+		return true;
+	}
+
+	private static string _path
+	{
+		get
 		{
-			serializer.Serialize(stream, this);
+			return Application.persistentDataPath + _namefile;
 		}
 	}
 
-	public static HolderSave Load(string path)
+	public static bool FilesaveExist()
+	{
+		return File.Exists(_path);
+	}
+
+	public void Save()
 	{
 		var serializer = new XmlSerializer(typeof(HolderSave));
-		using (var stream = new FileStream(path, FileMode.Open))
+		using (var stream = new FileStream(_path, FileMode.Create))
+		{
+			serializer.Serialize(stream, this);
+		}
+		Debug.LogError("Save Success");
+	}
+
+	public static HolderSave Load()
+	{
+		var serializer = new XmlSerializer(typeof(HolderSave));
+		using (var stream = new FileStream(_path, FileMode.Open))
 		{
 			return serializer.Deserialize(stream) as HolderSave;
 		}

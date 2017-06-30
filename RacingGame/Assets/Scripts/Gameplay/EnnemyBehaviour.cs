@@ -2,9 +2,15 @@
 using System.Collections;
 using System;
 
+/// <summary>
+///		Ennemy's Controller
+/// </summary>
 public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 {
 	public int ColumnCarIndex;
+	/// <summary>
+	///		Is reducing speed from origine for avoiding collision
+	/// </summary>
 	public bool SlowState { get; private set; }
 
 	private IEnumerator _slowBehaviour;
@@ -16,6 +22,8 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 		{
 			PlayerManager.Instance.InstanceP.HitByEnnemy(this);
 			CurrentBody.TransformIntoProjecticle(collision.transform.position);
+			CurrentBody.transform.SetParent(transform.parent);
+			SelfDestroy(false);
 		}
 	}
 
@@ -29,7 +37,7 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 		if (!SlowState && EnnemyManager.Instance.IsNearCar(this))
 		{
 			SlowState = true;
-			_slowBehaviour = ApplySlowBehaviour(1f);
+			_slowBehaviour = ApplySlowBehaviour(0.75f);
 		}
 
 		if (_slowBehaviour != null)
@@ -37,20 +45,28 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 		base.ApplyBehaviour();
 	}
 
+	/// <summary>
+	///		Behaviour of the slow process
+	/// </summary>
+	/// <param name="DurationSlow"></param>
+	/// <returns></returns>
 	private IEnumerator ApplySlowBehaviour(float DurationSlow)
 	{
 		float begSpeed = _data.CarData.CurrentSpeedZ;
-		float endSpeed = EnnemyManager.Instance.GetCarFrontSpeed(this);
-
+		EnnemyBehaviour target = EnnemyManager.Instance.GetFrontCar(this);
+		if (target == null)
+			yield break;
 		for (float t = 0f , perc = 0f; perc < 1f; t += Time.deltaTime)
 		{
-			if (EnnemyManager.Instance.IsNearCar(this))
-				endSpeed = EnnemyManager.Instance.GetCarFrontSpeed(this);
-
-			_data.CarData.CurrentSpeedZ = Mathf.Lerp(begSpeed, endSpeed, perc);
+			perc = Mathf.Clamp01(t / DurationSlow);
+			_data.CarData.CurrentSpeedZ = Mathf.Lerp(begSpeed, target.GetSpeed(), perc);
 			yield return null;
 		}
-
+		while (target != null)
+		{
+			_data.CarData.CurrentSpeedZ = target.GetSpeed();
+			yield return null;
+		}
 		_slowBehaviour = null;
 	}
 
@@ -62,5 +78,12 @@ public class EnnemyBehaviour : EntityBehaviour<EnnemyConfig, EnnemyData>
 	public CarType GetCarType()
 	{
 		return CurrentBody.Type;
+	}
+
+	protected override void OnResetToPool()
+	{
+		SlowState = false;
+		_slowBehaviour = null;
+		base.OnResetToPool();
 	}
 }

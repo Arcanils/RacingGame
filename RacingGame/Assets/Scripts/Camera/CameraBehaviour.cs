@@ -2,15 +2,19 @@
 using System.Collections;
 using System;
 
+/// <summary>
+///		Behaviour of the camera following the player
+/// </summary>
 public class CameraBehaviour : MonoBehaviour {
 
 
 	public static CameraBehaviour Instance { get; private set; }
 
-	public Vector3 OffsetFromPlayer;
-
 	public System.Action EventEndSwitchCar;
 
+
+
+	public Vector3 OffsetFromPlayer;
 	public Vector3 PositionPowerTransition
 	{
 		get
@@ -23,6 +27,7 @@ public class CameraBehaviour : MonoBehaviour {
 	private Transform _trans;
 	private IEnumerator _fctSwitch;
 	private IEnumerator _fctBehaviour;
+
 	public void Awake()
 	{
 		Instance = this;
@@ -79,6 +84,13 @@ public class CameraBehaviour : MonoBehaviour {
 		_fctBehaviour.MoveNext();
 	}
 
+	/// <summary>
+	///		Transition beetween current body's Player and the next
+	/// </summary>
+	/// <param name="NextCar"></param>
+	/// <param name="TimeSwitch"></param>
+	/// <param name="FuncAtEnd"></param>
+	/// <returns></returns>
 	private IEnumerator SwitchCarCam(Transform NextCar, float TimeSwitch, System.Action FuncAtEnd)
 	{
 		PlayerManager.Instance.PowerTransition = true;
@@ -88,7 +100,6 @@ public class CameraBehaviour : MonoBehaviour {
 			PlayerManager.Instance.PositionPlayer.z + OffsetFromPlayer.z);
 		Vector3 EndPos;
 
-		Debug.LogError(TimeSwitch);
 
 		for (float t = 0f; t < TimeSwitch; t += Time.unscaledDeltaTime)
 		{

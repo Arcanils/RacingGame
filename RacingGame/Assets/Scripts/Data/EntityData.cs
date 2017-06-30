@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public interface EntityConfig
 {
-	/*
-	void Init(EntityConfig Config);
-	string GetIDPoolObject();
-	float GetSpeedZ();
-	*/
+
 }
 
 public interface EntityData<T> where T : EntityConfig

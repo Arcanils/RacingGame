@@ -34,8 +34,8 @@ public class ConfigManager : MonoBehaviour {
 		_instance.Config = Resources.Load<DataConfig>(_gameConfigPath);
 	}
 
-	public void UpdateData(SaveUpgradeProgress UpgradeProgress)
+	public void UpdateData(HolderSave Save)
 	{
-		Config.PlayerData.UpdateData(UpgradeProgress);
+		Config.PlayerData.UpdateData(Save.UpgradeProgress);
 	}
 }
